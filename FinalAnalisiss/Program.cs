@@ -1,29 +1,38 @@
+using FinalAnalisis.Data;
+using FinalAnalisis.Services;
+using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+
+// Configuración Clásica de Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<FinalAnalisisContext>(options =>
+    options.UseSqlite("Data Source=finalanalisis.db"));
+
+builder.Services.AddScoped<IIncidenteService, IncidenteService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    var context = scope.ServiceProvider.GetRequiredService<FinalAnalisisContext>();
+    context.Database.EnsureCreated();
 }
 
-app.UseHttpsRedirection();
-app.UseRouting();
+// Activar Swagger Visual
+app.UseSwagger();
+app.UseSwaggerUI(c => 
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinalAnalisis API v1");
+    c.RoutePrefix = "swagger"; // Esto define que la URL sea /swagger
+});
 
 app.UseAuthorization();
+app.MapControllers();
 
-app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-
-app.Run();
+var puerto = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Run($"http://0.0.0.0:{puerto}");
