@@ -148,3 +148,8 @@ June 13, 2026 at 8:56 AM
 Rollback
 
 First deploy started for 8e1a7a8: api con render
+
+
+ahora me da este error en render, 
+
+error: failed to solve: failed to compute cache key: failed to calculate checksum of ref sub6um2qwqabkb5m9xolglqqe::pqqvnows3hn2dhhtr6lv7yi8c: "/FinalAnalisiss.csproj": not found
